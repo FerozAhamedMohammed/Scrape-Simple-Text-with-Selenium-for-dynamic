@@ -2,6 +2,8 @@
 # Course URL: https://www.udemy.com/course/automate-everything-with-python/
 
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from datetime import datetime as dt
 import time
 
 def get_drvier():
@@ -15,17 +17,30 @@ def get_drvier():
   options.add_argument("disable-blink-features=AutomationControlled")
 
   driver = webdriver.Chrome(options=options)
-  driver.get("http://automated.pythonanywhere.com")
+  driver.get("http://automated.pythonanywhere.com/login/")
   return driver
-
+#funtion to clean the text to get only the number
 def clean_text(text):
   output = float(text.split(": ")[1])
   return output
+#funtion to write the data in file and create a file
+def write_file(text):
+  filename = f"{dt.now().strftime('%Y-%m-%d.%H-%M-%S')}.txt"
+  with open(filename, "w") as file:
+    file.write(text)
+  
   
 def main():
   driver = get_drvier()
+  driver.find_element(by="id", value="id_username").send_keys("automated")
   time.sleep(2)
-  element = driver.find_element(by="xpath", value="/html/body/div[1]/div/h1[2]")
-  return clean_text(element.text)
+  driver.find_element(by="id", value="id_password").send_keys("automatedautomated"+ Keys.RETURN)
+  time.sleep(2)
+  driver.find_element(by="xpath",value = "/html/body/nav/div/a").click()
+  while True:
+    time.sleep(2)
+    element = driver.find_element(by="xpath",value="/html/body/div[1]/div/h1[2]")
+    text =str(clean_text(element.text))
+    write_file(text)
 
-print(main())
+main()
